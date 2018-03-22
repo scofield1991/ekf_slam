@@ -7,6 +7,7 @@
 #include "ekf.h"
 #include  <Eigen/Dense>
 #include <iostream>
+#include  <math.h>
 
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
@@ -28,6 +29,26 @@ void Ekf::initialize(int num_landmarks, double motion_noise)
 	std::cout << R << "\n";
 
 }
+
+void Ekf::prediction(const Odometry& odom)
+{
+	Eigen::Vector3d temp_mu = mu.head(3);
+
+	auto x_transform = odom.trans * cos(temp_mu(2) + odom.rot_1);
+	auto y_transform = odom.trans * sin(temp_mu(2) + odom.rot_1);
+	auto angle_transform = odom.rot_1 + odom.rot_2;
+
+	temp_mu(0) = temp_mu(0) + x_transform;
+	temp_mu(1) = temp_mu(1) + y_transform;
+	temp_mu(2) = temp_mu(2) + angle_transform;
+
+	mu.head(3) = temp_mu;
+
+
+
+}
+
+
 
 
 
